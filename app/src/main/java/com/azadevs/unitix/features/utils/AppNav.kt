@@ -24,16 +24,16 @@ fun AppNav(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable<HomeScreenRoute> {
-            HomeScreen{
-                navController.navigate(ConverterScreenRoute(it))
+            HomeScreen {
+                navController.navigate(ConverterScreenRoute(it.name))
             }
         }
 
         composable<ConverterScreenRoute> {
+            val categoryName = it.arguments?.getString("categoryName")
+            val category = Category.entries.find { it.name == categoryName }
             ConvertScreen(
-                category = it.arguments?.get(
-                    "category"
-                ) as Category, {
+                category = category, {
                     navController.navigateUp()
                 })
         }

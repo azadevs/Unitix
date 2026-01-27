@@ -3,4 +3,8 @@
     <string name="unit_converter">Unit Converter</string>
     <string name="home_desc"><![CDATA[Fast & offline unit converter]]></string>
     <string name="app_version"><![CDATA[Unitix v1.0 • Offline & Private]]></string>
+    <string name="to">To</string>
+    <string name="result">Result</string>
+    <string name="from">From</string>
+    <string name="value">Value</string>
 </resources>

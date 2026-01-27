@@ -1,6 +1,5 @@
 package com.azadevs.unitix.features.utils
 
-import com.azadevs.unitix.data.model.Category
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,4 +11,4 @@ import kotlinx.serialization.Serializable
 object HomeScreenRoute
 
 @Serializable
-data class ConverterScreenRoute(val category: Category)
+data class ConverterScreenRoute(val categoryName: String)

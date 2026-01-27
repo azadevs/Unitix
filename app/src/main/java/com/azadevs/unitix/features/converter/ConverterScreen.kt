@@ -1,35 +1,35 @@
 package com.azadevs.unitix.features.converter
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.azadevs.unitix.R
 import com.azadevs.unitix.data.model.Category
 import com.azadevs.unitix.data.model.UnitItem
-import com.azadevs.unitix.data.model.UnitType
+import com.azadevs.unitix.features.converter.component.UnitDropdown
 import com.azadevs.unitix.features.converter.viewmodel.ConverterViewModel
 
 /**
@@ -38,124 +38,100 @@ import com.azadevs.unitix.features.converter.viewmodel.ConverterViewModel
  */
 @Composable
 fun ConvertScreen(
-    category: Category,
+    category: Category?,
     onBack: () -> Unit,
-    vm: ConverterViewModel = viewModel<ConverterViewModel>()
+    viewModel: ConverterViewModel = viewModel()
 ) {
     val units = remember {
         UnitItem.units.filter { it.category == category }
     }
 
     LaunchedEffect(category) {
-        vm.onFromUnitChange(units.first().type)
-        vm.onToUnitChange(units.last().type)
+        viewModel.onFromUnitChange(units.first().type)
+        viewModel.onToUnitChange(units.last().type)
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        TextButton(onClick = onBack) {
-            Text("Back")
+
+        IconButton(onClick = onBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null
+            )
         }
 
-        Spacer(Modifier.height(8.dp))
-
         Text(
-            text = category.title,
+            text = category?.title ?: "",
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(20.dp))
 
-        OutlinedTextField(
-            value = vm.inputText,
-            onValueChange = vm::onInputChange,
-            label = { Text("Value") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        Card(
+            shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = viewModel.inputText,
+                    onValueChange = viewModel::onInputChange,
+                    label = { Text(stringResource(R.string.value)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
 
-        UnitDropdown(
-            label = "From",
-            items = units,
-            selected = vm.fromUnit,
-            onSelect = vm::onFromUnitChange
-        )
+                UnitDropdown(
+                    label = stringResource(R.string.from),
+                    items = units,
+                    selected = viewModel.fromUnit,
+                    onSelect = viewModel::onFromUnitChange
+                )
 
-        Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
-        UnitDropdown(
-            label = "To",
-            items = units,
-            selected = vm.toUnit,
-            onSelect = vm::onToUnitChange
-        )
+                UnitDropdown(
+                    label = stringResource(R.string.to),
+                    items = units,
+                    selected = viewModel.toUnit,
+                    onSelect = viewModel::onToUnitChange
+                )
+            }
+        }
 
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = "Result",
+            text = stringResource(R.string.result),
             style = MaterialTheme.typography.titleMedium
         )
 
         Spacer(Modifier.height(8.dp))
 
         Card(
+            shape = RoundedCornerShape(24.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = vm.resultText,
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun UnitDropdown(
-    label: String,
-    items: List<UnitItem>,
-    selected: UnitType,
-    onSelect: (UnitType) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    val selectedItem = items.first { it.type == selected }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
-        OutlinedTextField(
-            value = selectedItem.label,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(type = MenuAnchorType.PrimaryEditable)
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(item.label) },
-                    onClick = {
-                        onSelect(item.type)
-                        expanded = false
-                    }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = viewModel.resultText,
+                    style = MaterialTheme.typography.displaySmall
                 )
             }
         }
     }
+
 }
+
