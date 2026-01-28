@@ -14,7 +14,7 @@
             android:name=".features.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Unitix">
+            android:theme="@style/Theme.Unitix.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

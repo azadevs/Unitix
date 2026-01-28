@@ -60,4 +60,6 @@ dependencies {
 //    implementation(libs.datastore)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.navigation.compose)
+    implementation(libs.androidx.core.splashscreen)
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
 }

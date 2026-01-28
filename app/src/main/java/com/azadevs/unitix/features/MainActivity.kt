@@ -8,16 +8,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.azadevs.unitix.core.ui.theme.UnitixTheme
 import com.azadevs.unitix.features.utils.AppNav
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             UnitixTheme {
-                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNav(
                         modifier = Modifier.padding(innerPadding)
                     )
