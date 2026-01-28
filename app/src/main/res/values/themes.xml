@@ -5,6 +5,7 @@
 
     <style name="Theme.Unitix.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/logo_unitix</item>
+        <item name="windowSplashScreenBackground">@color/splash_bg</item>
         <item name="postSplashScreenTheme">@style/Theme.Unitix</item>
     </style>
 </resources>
