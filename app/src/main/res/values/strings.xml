@@ -7,4 +7,7 @@
     <string name="result">Result</string>
     <string name="from">From</string>
     <string name="value">Value</string>
+    <string name="clear">Clear</string>
+    <string name="swap">Swap</string>
+    <string name="copy">Copy</string>
 </resources>
