@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.azadevs.unitix.data.engine.ConverterEngine
 import com.azadevs.unitix.data.model.UnitType
+import java.text.DecimalFormat
+import kotlin.math.abs
 
 /**
  * Created by : Azamat Kalmurzaev
@@ -54,10 +56,30 @@ class ConverterViewModel : ViewModel() {
     }
 
     private fun format(v: Double): String {
-        return if (v % 1 == 0.0) {
-            v.toLong().toString()
-        } else {
-            String.format("%.4f", v).trimEnd('0').trimEnd('.')
+        val absVal = abs(v)
+
+        return when (absVal) {
+            0.0 -> "0"
+            !in 0.0001..<1.0E9 -> {
+                DecimalFormat("0.####E0").format(v)
+            }
+
+            else -> {
+                val df = DecimalFormat("#,##0.####")
+                df.format(v)
+            }
         }
+    }
+
+    fun swapUnits() {
+        val temp = fromUnit
+        fromUnit = toUnit
+        toUnit = temp
+        recalc()
+    }
+
+    fun clearInput() {
+        inputText = ""
+        resultText = "0"
     }
 }
