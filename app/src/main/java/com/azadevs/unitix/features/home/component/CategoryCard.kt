@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.azadevs.unitix.data.model.Category
 
@@ -36,6 +37,7 @@ fun CategoryCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(130.dp)
+            .clip(RoundedCornerShape(20.dp))
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp)
     ) {
