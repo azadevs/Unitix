@@ -24,11 +24,15 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +45,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,6 +59,7 @@ import com.azadevs.unitix.features.converter.viewmodel.ConverterViewModel
  * Created by : Azamat Kalmurzaev
  * 26/01/26
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConvertScreen(
     category: Category?,
@@ -77,138 +83,150 @@ fun ConvertScreen(
         viewModel.onToUnitChange(units.last().type)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-
-        IconButton(onClick = onBack) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                title = {
+                    Text(
+                        text = category?.title ?: "",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                }
             )
         }
-
-        Text(
-            text = category?.title ?: "",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.fillMaxWidth()
+    ) { paddingValues ->
+        Spacer(Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .animateContentSize()
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedTextField(
-                    value = viewModel.inputText,
-                    onValueChange = viewModel::onInputChange,
-                    label = { Text(stringResource(R.string.value)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        if (viewModel.inputText.isNotEmpty()) {
-                            IconButton(
-                                onClick = viewModel::clearInput
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = stringResource(R.string.clear)
-                                )
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .animateContentSize()
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.inputText,
+                        onValueChange = viewModel::onInputChange,
+                        label = { Text(stringResource(R.string.value)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            if (viewModel.inputText.isNotEmpty()) {
+                                IconButton(
+                                    onClick = viewModel::clearInput
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = stringResource(R.string.clear)
+                                    )
+                                }
                             }
                         }
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text(stringResource(R.string.from))
+
+                        IconButton(onClick = {
+                            rotated = !rotated
+                            viewModel.swapUnits()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.SwapVert,
+                                contentDescription = stringResource(R.string.swap),
+                                modifier = Modifier.rotate(rotation)
+                            )
+                        }
+
+                        Text(stringResource(R.string.to))
                     }
-                )
 
-                Spacer(Modifier.height(12.dp))
+                    UnitDropdown(
+                        label = stringResource(R.string.from),
+                        items = units,
+                        selected = viewModel.fromUnit,
+                        onSelect = viewModel::onFromUnitChange
+                    )
 
+                    Spacer(Modifier.height(12.dp))
+
+                    UnitDropdown(
+                        label = stringResource(R.string.to),
+                        items = units,
+                        selected = viewModel.toUnit,
+                        onSelect = viewModel::onToUnitChange
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(R.string.result),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(stringResource(R.string.from))
+                    AnimatedContent(
+                        targetState = viewModel.resultText,
+                        label = stringResource(R.string.result),
+                        transitionSpec = {
+                            (fadeIn() + scaleIn(initialScale = 0.98f)).togetherWith(
+                                fadeOut() + scaleOut(targetScale = 1.02f)
+                            )
+                        }
+                    ) { value ->
+                        Text(
+                            text = value,
+                            style = MaterialTheme.typography.displaySmall
+                        )
+                    }
 
                     IconButton(onClick = {
-                        rotated = !rotated
-                        viewModel.swapUnits()
+                        clipboard.setText(AnnotatedString(viewModel.resultText))
                     }) {
                         Icon(
-                            imageVector = Icons.Default.SwapVert,
-                            contentDescription = stringResource(R.string.swap),
-                            modifier = Modifier.rotate(rotation)
+                            Icons.Default.ContentCopy,
+                            contentDescription = stringResource(R.string.copy)
                         )
                     }
-
-                    Text(stringResource(R.string.to))
-                }
-
-                UnitDropdown(
-                    label = stringResource(R.string.from),
-                    items = units,
-                    selected = viewModel.fromUnit,
-                    onSelect = viewModel::onFromUnitChange
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                UnitDropdown(
-                    label = stringResource(R.string.to),
-                    items = units,
-                    selected = viewModel.toUnit,
-                    onSelect = viewModel::onToUnitChange
-                )
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        Text(
-            text = stringResource(R.string.result),
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                AnimatedContent(
-                    targetState = viewModel.resultText,
-                    label = stringResource(R.string.result),
-                    transitionSpec = {
-                        (fadeIn() + scaleIn(initialScale = 0.98f)).togetherWith(
-                            fadeOut() + scaleOut(targetScale = 1.02f)
-                        )
-                    }
-                ) { value ->
-                    Text(
-                        text = value,
-                        style = MaterialTheme.typography.displaySmall
-                    )
-                }
-
-                IconButton(onClick = {
-                    clipboard.setText(AnnotatedString(viewModel.resultText))
-                }) {
-                    Icon(
-                        Icons.Default.ContentCopy,
-                        contentDescription = stringResource(R.string.copy)
-                    )
                 }
             }
         }
