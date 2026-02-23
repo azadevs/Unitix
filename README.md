@@ -102,3 +102,11 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/azadevs/Unitix.git
+```
+
+---
+
+## 📲 Availability
+
+The app will be available on Google Play soon.
+
