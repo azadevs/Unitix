@@ -101,4 +101,4 @@ All conversion history is stored locally on the device.
 Clone the repository:
 
 ```bash
-git clone https://github.com/azadevs/unitix.git
+git clone https://github.com/azadevs/Unitix.git
