@@ -45,7 +45,8 @@ class ConverterViewModel : ViewModel() {
     }
 
     private fun recalc() {
-        val value = inputText.toDoubleOrNull()
+        val parsedText = inputText.replace(',', '.')
+        val value = parsedText.toDoubleOrNull()
         if (value == null) {
             resultText = "0"
             return

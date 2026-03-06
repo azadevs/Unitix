@@ -60,6 +60,7 @@ import com.azadevs.unitix.features.converter.viewmodel.ConverterViewModel
  * 26/01/26
  */
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 fun ConvertScreen(
     category: Category?,
@@ -127,7 +128,9 @@ fun ConvertScreen(
                         value = viewModel.inputText,
                         onValueChange = viewModel::onInputChange,
                         label = { Text(stringResource(R.string.value)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = if (category == Category.TEMPERATURE) KeyboardType.Text else KeyboardType.Decimal
+                        ),
                         modifier = Modifier.fillMaxWidth(),
                         trailingIcon = {
                             if (viewModel.inputText.isNotEmpty()) {
