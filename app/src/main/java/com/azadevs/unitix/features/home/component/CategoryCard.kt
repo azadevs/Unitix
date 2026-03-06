@@ -1,7 +1,10 @@
 package com.azadevs.unitix.features.home.component
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,9 +26,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.azadevs.unitix.data.model.Category
@@ -39,6 +47,10 @@ fun CategoryCard(
     category: Category,
     onClick: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(targetValue = if (isPressed) 0.95f else 1f, label = "bounce")
+
     val icon = when (category) {
         Category.LENGTH -> Icons.Rounded.Straighten
         Category.WEIGHT -> Icons.Rounded.MonitorWeight
@@ -46,15 +58,27 @@ fun CategoryCard(
         Category.SPEED -> Icons.Rounded.Speed
     }
 
+    val gradientColors = when (category) {
+        Category.LENGTH -> listOf(Color(0xFF3B82F6), Color(0xFF60A5FA))
+        Category.WEIGHT -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
+        Category.TEMPERATURE -> listOf(Color(0xFFF59E0B), Color(0xFFFBBF24))
+        Category.SPEED -> listOf(Color(0xFF10B981), Color(0xFF34D399))
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
+            .scale(scale)
             .clip(RoundedCornerShape(24.dp))
-            .clickable { onClick() },
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null, // Disable default ripple for custom bounce
+                onClick = onClick
+            ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -68,16 +92,14 @@ fun CategoryCard(
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = CircleShape
-                    ),
+                    .clip(CircleShape)
+                    .background(Brush.linearGradient(gradientColors)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = category.title,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
             }
