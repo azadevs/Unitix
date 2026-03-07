@@ -44,6 +44,21 @@ class ConverterViewModel : ViewModel() {
         recalc()
     }
 
+    fun initWith(initialValue: String?, initialFromUnitName: String?) {
+        if (initialValue != null) {
+            inputText = initialValue
+        }
+        if (initialFromUnitName != null) {
+            val unitType = UnitType.entries.find { it.name == initialFromUnitName }
+            if (unitType != null) {
+                fromUnit = unitType
+            }
+        }
+        if (initialValue != null || initialFromUnitName != null) {
+            recalc()
+        }
+    }
+
     private fun recalc() {
         val parsedText = inputText.replace(',', '.')
         val value = parsedText.toDoubleOrNull()
