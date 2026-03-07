@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.azadevs.unitix.data.model.Category
 import com.azadevs.unitix.features.converter.ConvertScreen
 import com.azadevs.unitix.features.home.HomeScreen
@@ -24,20 +25,29 @@ fun AppNav(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable<HomeScreenRoute> {
-            HomeScreen { category ->
-                navController.navigate(ConverterScreenRoute(category.name))
-            }
+            HomeScreen(
+                onCategoryClick = { category ->
+                    navController.navigate(ConverterScreenRoute(category.name))
+                },
+                onSmartClipboardClick = { category, value, unitName ->
+                    navController.navigate(ConverterScreenRoute(category.name, value, unitName))
+                }
+            )
         }
 
         composable<ConverterScreenRoute> { data ->
-            val categoryName = data.arguments?.getString("categoryName")
+            val route = data.toRoute<ConverterScreenRoute>()
             val category = Category.entries.find { entry ->
-                entry.name == categoryName
+                entry.name == route.categoryName
             }
             ConvertScreen(
-                category = category, {
+                category = category,
+                initialValue = route.initialValue,
+                initialFromUnitName = route.initialFromUnitName,
+                onBack = {
                     navController.navigateUp()
-                })
+                }
+            )
         }
 
     }
