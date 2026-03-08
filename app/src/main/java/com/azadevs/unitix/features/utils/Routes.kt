@@ -11,8 +11,4 @@ import kotlinx.serialization.Serializable
 object HomeScreenRoute
 
 @Serializable
-data class ConverterScreenRoute(
-    val categoryName: String,
-    val initialValue: String? = null,
-    val initialFromUnitName: String? = null
-)
+data class ConverterScreenRoute(val categoryName: String)

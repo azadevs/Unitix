@@ -82,8 +82,6 @@ import com.azadevs.unitix.features.converter.viewmodel.ConverterViewModel
 @Composable
 fun ConvertScreen(
     category: Category?,
-    initialValue: String? = null,
-    initialFromUnitName: String? = null,
     onBack: () -> Unit,
     viewModel: ConverterViewModel = viewModel()
 ) {
@@ -118,10 +116,9 @@ fun ConvertScreen(
         }
     }
 
-    LaunchedEffect(category, initialValue, initialFromUnitName) {
+    LaunchedEffect(category) {
         viewModel.onFromUnitChange(units.first().type)
         viewModel.onToUnitChange(units.last().type)
-        viewModel.initWith(initialValue, initialFromUnitName)
     }
 
     val gradientColors = when (category) {
