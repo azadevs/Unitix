@@ -21,5 +21,47 @@ enum class UnitType {
 
     KMH,
     MS,
-    MPH
+    MPH,
+
+    SQ_METER,
+    SQ_KILOMETER,
+    HECTARE,
+    ACRE,
+    SQ_MILE,
+
+    LITER,
+    MILLILITER,
+    CUBIC_METER,
+    GALLON,
+
+    BYTE,
+    KILOBYTE,
+    MEGABYTE,
+    GIGABYTE,
+    TERABYTE,
+
+    MILLISECOND,
+    SECOND,
+    MINUTE,
+    HOUR,
+    DAY,
+    WEEK,
+
+    WATT,
+    KILOWATT,
+    HORSEPOWER,
+
+    PASCAL,
+    BAR,
+    PSI,
+    ATMOSPHERE,
+
+    JOULE,
+    KILOJOULE,
+    CALORIE,
+    KILOCALORIE,
+
+    DEGREE,
+    RADIAN,
+    GRADIAN
 }

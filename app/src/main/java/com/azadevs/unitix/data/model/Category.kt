@@ -10,5 +10,13 @@ enum class Category(
     LENGTH("Length"),
     WEIGHT("Weight"),
     TEMPERATURE("Temperature"),
-    SPEED("Speed")
+    SPEED("Speed"),
+    AREA("Area"),
+    VOLUME("Volume"),
+    DATA("Data"),
+    TIME("Time"),
+    POWER("Power"),
+    PRESSURE("Pressure"),
+    ENERGY("Energy"),
+    ANGLE("Angle")
 }

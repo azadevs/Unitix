@@ -19,10 +19,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ChangeHistory
+import androidx.compose.material.icons.rounded.CropSquare
+import androidx.compose.material.icons.rounded.FlashOn
+import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.MonitorWeight
+import androidx.compose.material.icons.rounded.Opacity
+import androidx.compose.material.icons.rounded.Science
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material.icons.rounded.Thermostat
+import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -35,9 +43,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +85,14 @@ fun CategoryCard(
         Category.WEIGHT -> Icons.Rounded.MonitorWeight
         Category.TEMPERATURE -> Icons.Rounded.Thermostat
         Category.SPEED -> Icons.Rounded.Speed
+        Category.AREA -> Icons.Rounded.CropSquare
+        Category.VOLUME -> Icons.Rounded.Opacity
+        Category.DATA -> Icons.Rounded.Memory
+        Category.TIME -> Icons.Rounded.Timer
+        Category.POWER -> Icons.Rounded.FlashOn
+        Category.PRESSURE -> Icons.Rounded.Science
+        Category.ENERGY -> Icons.Rounded.LocalFireDepartment
+        Category.ANGLE -> Icons.Rounded.ChangeHistory
     }
 
     val gradientColors = when (category) {
@@ -84,13 +100,24 @@ fun CategoryCard(
         Category.WEIGHT -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
         Category.TEMPERATURE -> listOf(Color(0xFFF59E0B), Color(0xFFFBBF24))
         Category.SPEED -> listOf(Color(0xFF10B981), Color(0xFF34D399))
+        Category.AREA -> listOf(Color(0xFFEC4899), Color(0xFFF472B6))
+        Category.VOLUME -> listOf(Color(0xFF06B6D4), Color(0xFF22D3EE))
+        Category.DATA -> listOf(Color(0xFF6366F1), Color(0xFF818CF8))
+        Category.TIME -> listOf(Color(0xFFF43F5E), Color(0xFFFB7185))
+        Category.POWER -> listOf(Color(0xFFEAB308), Color(0xFFFDE047))
+        Category.PRESSURE -> listOf(Color(0xFF14B8A6), Color(0xFF2DD4BF))
+        Category.ENERGY -> listOf(Color(0xFFF97316), Color(0xFFFB923C))
+        Category.ANGLE -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
-            .scale(scale)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
             .clip(RoundedCornerShape(24.dp))
             .border(
                 width = 1.dp,
