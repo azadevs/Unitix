@@ -25,13 +25,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -71,6 +74,7 @@ import com.azadevs.unitix.data.model.Category
 import com.azadevs.unitix.data.model.UnitItem
 import com.azadevs.unitix.features.converter.component.UnitDropdown
 import com.azadevs.unitix.features.converter.viewmodel.ConverterViewModel
+import com.azadevs.unitix.features.history.HistoryBottomSheet
 
 /**
  * Created by : Azamat Kalmurzaev
@@ -158,6 +162,15 @@ fun ConvertScreen(
                             contentDescription = null
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.showHistorySheet(true) }) {
+                        Icon(
+                            imageVector = Icons.Default.History,
+                            contentDescription = "History",
+                            tint = Color.White
+                        )
+                    }
                 }
             )
         }
@@ -186,184 +199,201 @@ fun ConvertScreen(
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
             ) {
-                Spacer(Modifier.height(16.dp))
-                Card(
-                    shape = RoundedCornerShape(20.dp),
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .border(
-                            1.dp,
-                            Color.White.copy(alpha = 0.15f),
-                            RoundedCornerShape(20.dp)
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .animateContentSize()
-                    ) {
-                        OutlinedTextField(
-                            value = viewModel.inputText,
-                            onValueChange = { newText ->
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                viewModel.onInputChange(newText)
-                            },
-                            label = { Text(stringResource(R.string.value)) },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = if (category == Category.TEMPERATURE) KeyboardType.Text else KeyboardType.Decimal
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            trailingIcon = {
-                                if (viewModel.inputText.isNotEmpty()) {
-                                    IconButton(
-                                        onClick = {
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            viewModel.clearInput()
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Clear,
-                                            contentDescription = stringResource(R.string.clear)
-                                        )
-                                    }
-                                }
-                            }
-                        )
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            Text(stringResource(R.string.from))
-
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .graphicsLayer {
-                                        scaleX = swapScale
-                                        scaleY = swapScale
-                                    }
-                                    .clip(CircleShape)
-                                    .background(Brush.linearGradient(gradientColors))
-                                    .clickable(
-                                        interactionSource = swapInteractionSource,
-                                        indication = null
-                                    ) {
-                                        rotated = !rotated
-                                        viewModel.swapUnits()
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.SwapVert,
-                                    contentDescription = stringResource(R.string.swap),
-                                    modifier = Modifier.graphicsLayer { rotationZ = rotation },
-                                    tint = Color.White
-                                )
-                            }
-
-                            Text(stringResource(R.string.to))
-                        }
-
-                        UnitDropdown(
-                            label = stringResource(R.string.from),
-                            items = units,
-                            selected = viewModel.fromUnit,
-                            onSelect = { unit ->
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                viewModel.onFromUnitChange(unit)
-                            }
-                        )
-
-                        Spacer(Modifier.height(12.dp))
-
-                        UnitDropdown(
-                            label = stringResource(R.string.to),
-                            items = units,
-                            selected = viewModel.toUnit,
-                            onSelect = { unit ->
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                viewModel.onToUnitChange(unit)
-                            }
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                Text(
-                    text = stringResource(R.string.result),
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                Card(
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(
-                            1.dp,
-                            Color.White.copy(alpha = 0.2f),
-                            RoundedCornerShape(24.dp)
-                        ),
-                    elevation = CardDefaults.cardElevation(8.dp)
-                ) {
-                    Box(
+                    Spacer(Modifier.height(16.dp))
+                    Card(
+                        shape = RoundedCornerShape(20.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Brush.linearGradient(gradientColors))
+                            .border(
+                                1.dp,
+                                Color.White.copy(alpha = 0.15f),
+                                RoundedCornerShape(20.dp)
+                            ),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                                .padding(16.dp)
+                                .animateContentSize()
                         ) {
-                            AnimatedContent(
-                                targetState = viewModel.resultText,
-                                label = "counterAnimation",
-                                transitionSpec = {
-                                    if (targetState > initialState) {
-                                        (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                                            slideOutVertically { height -> -height } + fadeOut())
-                                    } else {
-                                        (slideInVertically { height -> -height } + fadeIn()).togetherWith(
-                                            slideOutVertically { height -> height } + fadeOut())
+                            OutlinedTextField(
+                                value = viewModel.inputText,
+                                onValueChange = { newText ->
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    viewModel.onInputChange(newText)
+                                },
+                                label = { Text(stringResource(R.string.value)) },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = if (category == Category.TEMPERATURE) KeyboardType.Text else KeyboardType.Decimal
+                                ),
+                                modifier = Modifier.fillMaxWidth(),
+                                trailingIcon = {
+                                    if (viewModel.inputText.isNotEmpty()) {
+                                        IconButton(
+                                            onClick = {
+                                                hapticFeedback.performHapticFeedback(
+                                                    HapticFeedbackType.LongPress
+                                                )
+                                                viewModel.clearInput()
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Clear,
+                                                contentDescription = stringResource(R.string.clear)
+                                            )
+                                        }
                                     }
                                 }
-                            ) { value ->
-                                Text(
-                                    text = value,
-                                    style = MaterialTheme.typography.displaySmall,
-                                    color = Color.White,
-                                    maxLines = 1,
-                                    modifier = Modifier.weight(1f, false)
-                                )
+                            )
+
+                            Spacer(Modifier.height(12.dp))
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ) {
+                                Text(stringResource(R.string.from))
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .graphicsLayer {
+                                            scaleX = swapScale
+                                            scaleY = swapScale
+                                        }
+                                        .clip(CircleShape)
+                                        .background(Brush.linearGradient(gradientColors))
+                                        .clickable(
+                                            interactionSource = swapInteractionSource,
+                                            indication = null
+                                        ) {
+                                            rotated = !rotated
+                                            viewModel.swapUnits()
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.SwapVert,
+                                        contentDescription = stringResource(R.string.swap),
+                                        modifier = Modifier.graphicsLayer { rotationZ = rotation },
+                                        tint = Color.White
+                                    )
+                                }
+
+                                Text(stringResource(R.string.to))
                             }
 
-                            IconButton(onClick = {
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                clipboard.setText(AnnotatedString(viewModel.resultText))
-                            }) {
-                                Icon(
-                                    Icons.Default.ContentCopy,
-                                    contentDescription = stringResource(R.string.copy),
-                                    tint = Color.White
-                                )
+                            UnitDropdown(
+                                label = stringResource(R.string.from),
+                                items = units,
+                                selected = viewModel.fromUnit,
+                                onSelect = { unit ->
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    viewModel.onFromUnitChange(unit)
+                                }
+                            )
+
+                            Spacer(Modifier.height(12.dp))
+
+                            UnitDropdown(
+                                label = stringResource(R.string.to),
+                                items = units,
+                                selected = viewModel.toUnit,
+                                onSelect = { unit ->
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    viewModel.onToUnitChange(unit)
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    Text(
+                        text = stringResource(R.string.result),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Card(
+                        shape = RoundedCornerShape(24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                1.dp,
+                                Color.White.copy(alpha = 0.2f),
+                                RoundedCornerShape(24.dp)
+                            ),
+                        elevation = CardDefaults.cardElevation(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Brush.linearGradient(gradientColors))
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                AnimatedContent(
+                                    targetState = viewModel.resultText,
+                                    label = "counterAnimation",
+                                    transitionSpec = {
+                                        if (targetState > initialState) {
+                                            (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                                                slideOutVertically { height -> -height } + fadeOut())
+                                        } else {
+                                            (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                                                slideOutVertically { height -> height } + fadeOut())
+                                        }
+                                    }
+                                ) { value ->
+                                    Text(
+                                        text = value,
+                                        style = MaterialTheme.typography.displaySmall,
+                                        color = Color.White,
+                                        maxLines = 1,
+                                        modifier = Modifier.weight(1f, false)
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    clipboard.setText(AnnotatedString(viewModel.resultText))
+                                }) {
+                                    Icon(
+                                        Icons.Default.ContentCopy,
+                                        contentDescription = stringResource(R.string.copy),
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         }
                     }
+
+                    Spacer(Modifier.height(16.dp))
                 }
             }
         }
+    }
+
+    if (viewModel.isHistorySheetVisible) {
+        HistoryBottomSheet(
+            viewModel = viewModel,
+            onDismiss = { viewModel.showHistorySheet(false) }
+        )
     }
 }
