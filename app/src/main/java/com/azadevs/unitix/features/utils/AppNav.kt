@@ -31,9 +31,11 @@ fun AppNav(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable<HomeScreenRoute> {
-            HomeScreen { category ->
-                navController.navigate(ConverterScreenRoute(category.name))
-            }
+            HomeScreen(
+                onCategoryClick = { category ->
+                    navController.navigate(ConverterScreenRoute(category.name))
+                }
+            )
         }
 
         composable<ConverterScreenRoute> { data ->
