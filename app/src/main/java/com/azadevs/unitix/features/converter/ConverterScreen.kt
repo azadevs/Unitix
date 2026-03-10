@@ -152,6 +152,7 @@ fun ConvertScreen(
         Category.PRESSURE -> listOf(Color(0xFF14B8A6), Color(0xFF2DD4BF))
         Category.ENERGY -> listOf(Color(0xFFF97316), Color(0xFFFB923C))
         Category.ANGLE -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
+        Category.CURRENCY -> listOf(Color(0xFF22C55E), Color(0xFF4ADE80))
         null -> listOf(Color.Transparent, Color.Transparent)
     }
 

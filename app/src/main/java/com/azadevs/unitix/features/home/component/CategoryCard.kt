@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AttachMoney
 import androidx.compose.material.icons.rounded.ChangeHistory
 import androidx.compose.material.icons.rounded.CropSquare
 import androidx.compose.material.icons.rounded.FlashOn
@@ -93,6 +94,7 @@ fun CategoryCard(
         Category.PRESSURE -> Icons.Rounded.Science
         Category.ENERGY -> Icons.Rounded.LocalFireDepartment
         Category.ANGLE -> Icons.Rounded.ChangeHistory
+        Category.CURRENCY -> Icons.Rounded.AttachMoney
     }
 
     val gradientColors = when (category) {
@@ -108,6 +110,7 @@ fun CategoryCard(
         Category.PRESSURE -> listOf(Color(0xFF14B8A6), Color(0xFF2DD4BF))
         Category.ENERGY -> listOf(Color(0xFFF97316), Color(0xFFFB923C))
         Category.ANGLE -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
+        Category.CURRENCY -> listOf(Color(0xFF22C55E), Color(0xFF4ADE80))
     }
 
     Card(

@@ -18,5 +18,6 @@ enum class Category(
     POWER("Power"),
     PRESSURE("Pressure"),
     ENERGY("Energy"),
-    ANGLE("Angle")
+    ANGLE("Angle"),
+    CURRENCY("Currency")
 }
