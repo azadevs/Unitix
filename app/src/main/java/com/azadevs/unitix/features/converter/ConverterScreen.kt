@@ -86,7 +86,9 @@ import com.azadevs.unitix.features.history.HistoryBottomSheet
 fun ConvertScreen(
     category: Category?,
     onBack: () -> Unit,
-    viewModel: ConverterViewModel = viewModel()
+    viewModel: ConverterViewModel = viewModel(),
+    prefillValue: String? = null,
+    prefillUnitType: String? = null
 ) {
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -119,9 +121,22 @@ fun ConvertScreen(
         }
     }
 
-    LaunchedEffect(category) {
-        viewModel.onFromUnitChange(units.first().type)
-        viewModel.onToUnitChange(units.last().type)
+    LaunchedEffect(category, prefillValue, prefillUnitType) {
+        if (prefillUnitType != null && prefillValue != null) {
+            try {
+                val type = com.azadevs.unitix.data.model.UnitType.valueOf(prefillUnitType)
+                viewModel.onFromUnitChange(type)
+                viewModel.onInputChange(prefillValue)
+                val toUnitType = units.lastOrNull { it.type != type }?.type ?: units.last().type
+                viewModel.onToUnitChange(toUnitType)
+            } catch (e: Exception) {
+                viewModel.onFromUnitChange(units.first().type)
+                viewModel.onToUnitChange(units.last().type)
+            }
+        } else {
+            viewModel.onFromUnitChange(units.first().type)
+            viewModel.onToUnitChange(units.last().type)
+        }
     }
 
     val gradientColors = when (category) {

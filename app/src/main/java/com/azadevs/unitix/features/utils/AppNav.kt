@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.azadevs.unitix.data.local.UnitixDatabase
 import com.azadevs.unitix.data.model.Category
 import com.azadevs.unitix.data.repository.HistoryRepository
@@ -34,14 +35,17 @@ fun AppNav(modifier: Modifier = Modifier) {
             HomeScreen(
                 onCategoryClick = { category ->
                     navController.navigate(ConverterScreenRoute(category.name))
+                },
+                onSmartClipboardTrigger = { categoryName, value, unitType ->
+                    navController.navigate(ConverterScreenRoute(categoryName, value, unitType))
                 }
             )
         }
 
         composable<ConverterScreenRoute> { data ->
-            val categoryName = data.arguments?.getString("categoryName")
+            val args = data.toRoute<ConverterScreenRoute>()
             val category = Category.entries.find { entry ->
-                entry.name == categoryName
+                entry.name == args.categoryName
             }
 
             val context = LocalContext.current
@@ -55,7 +59,9 @@ fun AppNav(modifier: Modifier = Modifier) {
                 onBack = {
                     navController.navigateUp()
                 },
-                viewModel = viewModel
+                viewModel = viewModel,
+                prefillValue = args.prefillValue,
+                prefillUnitType = args.prefillUnitType
             )
         }
 

@@ -72,10 +72,12 @@ fun HistoryBottomSheet(
                 divider = {},
                 indicator = { tabPositions ->
                     if (selectedTabIndex < tabPositions.size) {
-                        TabRowDefaults.Indicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                            color = MaterialTheme.colorScheme.primary,
-                            height = 3.dp
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier.tabIndicatorOffset(
+                                tabPositions[selectedTabIndex]
+                            ),
+                            height = 3.dp,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }

@@ -10,4 +10,8 @@
     <string name="clear">Clear</string>
     <string name="swap">Swap</string>
     <string name="copy">Copy</string>
+    <string name="clipboard_found_title">Found \'%1$s\' in clipboard.</string>
+    <string name="clipboard_convert_desc">Convert to %1$s directly?</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="yes_convert">Yes, convert</string>
 </resources>
