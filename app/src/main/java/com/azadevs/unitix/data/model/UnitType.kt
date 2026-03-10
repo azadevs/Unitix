@@ -8,8 +8,11 @@ enum class UnitType {
     METER,
     KILOMETER,
     CENTIMETER,
+    MILLIMETER,
     INCH,
     FOOT,
+    YARD,
+    MILE,
 
     GRAM,
     KILOGRAM,

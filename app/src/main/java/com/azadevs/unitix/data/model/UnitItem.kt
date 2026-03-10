@@ -14,8 +14,11 @@ data class UnitItem(
             UnitItem(UnitType.METER, "Meter (m)", Category.LENGTH),
             UnitItem(UnitType.KILOMETER, "Kilometer (km)", Category.LENGTH),
             UnitItem(UnitType.CENTIMETER, "Centimeter (cm)", Category.LENGTH),
+            UnitItem(UnitType.MILLIMETER, "Millimeter (mm)", Category.LENGTH),
             UnitItem(UnitType.INCH, "Inch (in)", Category.LENGTH),
             UnitItem(UnitType.FOOT, "Foot (ft)", Category.LENGTH),
+            UnitItem(UnitType.YARD, "Yard (yd)", Category.LENGTH),
+            UnitItem(UnitType.MILE, "Mile (mi)", Category.LENGTH),
 
             UnitItem(UnitType.GRAM, "Gram (g)", Category.WEIGHT),
             UnitItem(UnitType.KILOGRAM, "Kilogram (kg)", Category.WEIGHT),

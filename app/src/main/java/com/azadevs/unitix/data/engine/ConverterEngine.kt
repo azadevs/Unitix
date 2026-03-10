@@ -20,8 +20,11 @@ class ConverterEngine {
             UnitType.METER -> convertLength(value, 1.0, to)
             UnitType.KILOMETER -> convertLength(value, 1000.0, to)
             UnitType.CENTIMETER -> convertLength(value, 0.01, to)
+            UnitType.MILLIMETER -> convertLength(value, 0.001, to)
             UnitType.INCH -> convertLength(value, 0.0254, to)
             UnitType.FOOT -> convertLength(value, 0.3048, to)
+            UnitType.YARD -> convertLength(value, 0.9144, to)
+            UnitType.MILE -> convertLength(value, 1609.344, to)
 
             UnitType.GRAM -> convertWeight(value, 1.0, to)
             UnitType.KILOGRAM -> convertWeight(value, 1000.0, to)
@@ -93,8 +96,11 @@ class ConverterEngine {
             UnitType.METER -> meters
             UnitType.KILOMETER -> meters / 1000.0
             UnitType.CENTIMETER -> meters / 0.01
+            UnitType.MILLIMETER -> meters / 0.001
             UnitType.INCH -> meters / 0.0254
             UnitType.FOOT -> meters / 0.3048
+            UnitType.YARD -> meters / 0.9144
+            UnitType.MILE -> meters / 1609.344
             else -> meters
         }
     }
