@@ -11,6 +11,9 @@ import kotlinx.serialization.Serializable
 object HomeScreenRoute
 
 @Serializable
+object CurrencyScreenRoute
+
+@Serializable
 data class ConverterScreenRoute(
     val categoryName: String,
     val prefillValue: String? = null,
