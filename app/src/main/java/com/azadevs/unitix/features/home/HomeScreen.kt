@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -59,7 +58,7 @@ fun HomeScreen(
     onCategoryClick: (Category) -> Unit = {},
     onSmartClipboardTrigger: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
-    val categories = Category.entries
+    val categories = remember { Category.entries.filter { it != Category.CURRENCY } }
 
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
     val glowColor = remember(isDark) {
@@ -164,24 +163,6 @@ fun HomeScreen(
                         }
                     }
                 }
-                val versionName = remember {
-                    try {
-                        context.packageManager.getPackageInfo(context.packageName, 0).versionName
-                            ?: "1.0"
-                    } catch (e: Exception) {
-                        "1.0"
-                    }
-                }
-
-                Text(
-                    text = stringResource(R.string.app_version, versionName),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    textAlign = TextAlign.Center
-                )
             }
 
             AnimatedVisibility(
