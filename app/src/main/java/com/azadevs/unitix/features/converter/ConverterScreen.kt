@@ -139,24 +139,28 @@ fun ConvertScreen(
         }
     }
 
-    val gradientColors = when (category) {
-        Category.LENGTH -> listOf(Color(0xFF3B82F6), Color(0xFF60A5FA))
-        Category.WEIGHT -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
-        Category.TEMPERATURE -> listOf(Color(0xFFF59E0B), Color(0xFFFBBF24))
-        Category.SPEED -> listOf(Color(0xFF10B981), Color(0xFF34D399))
-        Category.AREA -> listOf(Color(0xFFEC4899), Color(0xFFF472B6))
-        Category.VOLUME -> listOf(Color(0xFF06B6D4), Color(0xFF22D3EE))
-        Category.DATA -> listOf(Color(0xFF6366F1), Color(0xFF818CF8))
-        Category.TIME -> listOf(Color(0xFFF43F5E), Color(0xFFFB7185))
-        Category.POWER -> listOf(Color(0xFFEAB308), Color(0xFFFDE047))
-        Category.PRESSURE -> listOf(Color(0xFF14B8A6), Color(0xFF2DD4BF))
-        Category.ENERGY -> listOf(Color(0xFFF97316), Color(0xFFFB923C))
-        Category.ANGLE -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
-        Category.CURRENCY -> listOf(Color(0xFF22C55E), Color(0xFF4ADE80))
-        null -> listOf(Color.Transparent, Color.Transparent)
+    val gradientColors = remember(category) {
+        when (category) {
+            Category.LENGTH -> listOf(Color(0xFF3B82F6), Color(0xFF60A5FA))
+            Category.WEIGHT -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
+            Category.TEMPERATURE -> listOf(Color(0xFFF59E0B), Color(0xFFFBBF24))
+            Category.SPEED -> listOf(Color(0xFF10B981), Color(0xFF34D399))
+            Category.AREA -> listOf(Color(0xFFEC4899), Color(0xFFF472B6))
+            Category.VOLUME -> listOf(Color(0xFF06B6D4), Color(0xFF22D3EE))
+            Category.DATA -> listOf(Color(0xFF6366F1), Color(0xFF818CF8))
+            Category.TIME -> listOf(Color(0xFFF43F5E), Color(0xFFFB7185))
+            Category.POWER -> listOf(Color(0xFFEAB308), Color(0xFFFDE047))
+            Category.PRESSURE -> listOf(Color(0xFF14B8A6), Color(0xFF2DD4BF))
+            Category.ENERGY -> listOf(Color(0xFFF97316), Color(0xFFFB923C))
+            Category.ANGLE -> listOf(Color(0xFF8B5CF6), Color(0xFFA78BFA))
+            Category.CURRENCY -> listOf(Color(0xFF22C55E), Color(0xFF4ADE80))
+            null -> listOf(Color.Transparent, Color.Transparent)
+        }
     }
 
-    val glowColor = gradientColors.firstOrNull()?.copy(alpha = 0.2f) ?: Color.Transparent
+    val glowColor = remember(gradientColors) {
+        gradientColors.firstOrNull()?.copy(alpha = 0.2f) ?: Color.Transparent
+    }
 
     Scaffold(
         topBar = {

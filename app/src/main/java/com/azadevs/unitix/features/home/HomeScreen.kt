@@ -62,14 +62,18 @@ fun HomeScreen(
     val categories = Category.entries
 
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
-    val glowColor =
+    val glowColor = remember(isDark) {
         if (isDark) Color(0xFF10B981).copy(alpha = 0.15f) else Color(0xFF34D399).copy(alpha = 0.2f)
+    }
 
-    val textGradient = Brush.linearGradient(
-        colors = listOf(MaterialTheme.colorScheme.primary, Color(0xFF0EA5E9)),
-        start = Offset.Zero,
-        end = Offset.Infinite
-    )
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val textGradient = remember(primaryColor) {
+        Brush.linearGradient(
+            colors = listOf(primaryColor, Color(0xFF0EA5E9)),
+            start = Offset.Zero,
+            end = Offset.Infinite
+        )
+    }
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val clipboardManager =

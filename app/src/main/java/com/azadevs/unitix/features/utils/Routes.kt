@@ -19,3 +19,6 @@ data class ConverterScreenRoute(
     val prefillValue: String? = null,
     val prefillUnitType: String? = null
 )
+
+@Serializable
+object SettingsScreenRoute

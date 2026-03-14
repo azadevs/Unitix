@@ -3,7 +3,6 @@ package com.azadevs.unitix.features.currency
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,8 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingDown
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
@@ -49,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.azadevs.unitix.features.currency.component.CurrencyRateItem
 import java.text.DecimalFormat
 import java.util.Locale
 
@@ -181,7 +179,6 @@ fun CurrencyScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Search Box
             OutlinedTextField(
                 value = uiState.searchQuery,
                 onValueChange = viewModel::onSearchQueryChanged,
@@ -206,21 +203,24 @@ fun CurrencyScreen(
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                val filteredRates = uiState.rates.filter {
-                    it.code.contains(uiState.searchQuery, ignoreCase = true)
+                val filteredRates = remember(uiState.searchQuery, uiState.rates) {
+                    uiState.rates.filter {
+                        it.code.contains(uiState.searchQuery, ignoreCase = true)
+                    }
                 }
+                val baseRate = remember(uiState.baseCurrency, uiState.rates) {
+                    uiState.rates.find { it.code == uiState.baseCurrency }?.rate ?: 1.0
+                }
+                val formatter = remember { DecimalFormat("#,##0.0000") }
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(filteredRates) { model ->
-                        val baseRate =
-                            uiState.rates.find { it.code == uiState.baseCurrency }?.rate ?: 1.0
-
-                        // For a general application: rate relative to baseCurrency
-                        val convertedRate = if (baseRate > 0) {
-                            (1.0 / baseRate) * model.rate
-                        } else 0.0
-
-                        val formatter = DecimalFormat("#,##0.0000")
+                    items(
+                        items = filteredRates,
+                        key = { it.code }
+                    ) { model ->
+                        val convertedRate = remember(baseRate, model.rate) {
+                            if (baseRate > 0) (1.0 / baseRate) * model.rate else 0.0
+                        }
 
                         CurrencyRateItem(
                             model = model,
@@ -245,80 +245,3 @@ fun CurrencyScreen(
     }
 }
 
-@Composable
-fun CurrencyRateItem(
-    model: CurrencyUiModel,
-    displayRate: String,
-    isSelected: Boolean
-) {
-    val bgColor =
-        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-    val textColor =
-        if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-    val trendColor = if (model.isUp) Color(0xFF10B981) else Color(0xFFEF4444)
-    val trendIcon =
-        if (model.isUp) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(bgColor)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val countryCode = if (model.code.length >= 2) model.code.substring(0, 2)
-                .lowercase(Locale.getDefault()) else "xx"
-            val flagUrl = "https://flagcdn.com/w80/${countryCode}.png"
-
-            AsyncImage(
-                model = flagUrl,
-                contentDescription = "${model.code} flag",
-                modifier = Modifier
-                    .width(44.dp)
-                    .height(30.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .border(0.5.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                    .background(Color.White),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = model.code,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = textColor,
-                    fontWeight = FontWeight.Bold
-                )
-                if (model.code != "USD") {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = trendIcon,
-                            contentDescription = null,
-                            tint = trendColor,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = String.format(Locale.US, "%.2f%%", model.trendPercentage),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = trendColor,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
-        }
-
-        Text(
-            text = displayRate,
-            style = MaterialTheme.typography.titleMedium,
-            color = textColor,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
