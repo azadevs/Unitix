@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -46,12 +47,26 @@ fun AppNav(modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // Bottom nav faqat top-level screenlarda ko'rinadi
-    val showBottomBar = remember(currentDestination) {
-        currentDestination?.route?.let { route ->
-            !route.contains("ConverterScreenRoute")
-        } ?: true
+    val showBottomBar by remember {
+        derivedStateOf {
+            navBackStackEntry?.destination?.route?.let { route ->
+                !route.contains("ConverterScreenRoute")
+            } ?: true
+        }
     }
+
+    // Hoist DI dependencies to AppNav scope to avoid re-creation on navigation
+    val context = LocalContext.current
+    val database = remember { UnitixDatabase.getDatabase(context) }
+    val retrofit = remember {
+        Retrofit.Builder()
+            .baseUrl(CurrencyApi.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+    val currencyApi = remember { retrofit.create(CurrencyApi::class.java) }
+    val currencyRepository = remember { CurrencyRepository(currencyApi, database.currencyDao()) }
+    val currencyFactory = remember { CurrencyViewModelFactory(currencyRepository) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -89,8 +104,6 @@ fun AppNav(modifier: Modifier = Modifier) {
                 val args = data.toRoute<ConverterScreenRoute>()
                 val category = Category.entries.find { it.name == args.categoryName }
 
-                val context = LocalContext.current
-                val database = remember { UnitixDatabase.getDatabase(context) }
                 val repository = remember { HistoryRepository(database.historyDao()) }
                 val factory = remember { ConverterViewModelFactory(repository) }
                 val viewModel: ConverterViewModel = viewModel(factory = factory)
@@ -105,19 +118,7 @@ fun AppNav(modifier: Modifier = Modifier) {
             }
 
             composable<CurrencyScreenRoute> {
-                val context = LocalContext.current
-                val database = remember { UnitixDatabase.getDatabase(context) }
-                val retrofit = remember {
-                    Retrofit.Builder()
-                        .baseUrl(CurrencyApi.BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build()
-                }
-                val api = remember { retrofit.create(CurrencyApi::class.java) }
-                val repository = remember { CurrencyRepository(api, database.currencyDao()) }
-                val factory = remember { CurrencyViewModelFactory(repository) }
-                val viewModel: CurrencyViewModel = viewModel(factory = factory)
-
+                val viewModel: CurrencyViewModel = viewModel(factory = currencyFactory)
                 CurrencyScreen(viewModel = viewModel)
             }
 
