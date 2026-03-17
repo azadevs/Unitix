@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.azadevs.unitix.data.engine.ConverterEngine
 import com.azadevs.unitix.data.local.entity.HistoryItemEntity
 import com.azadevs.unitix.data.model.Category
+import com.azadevs.unitix.data.model.UnitItem
 import com.azadevs.unitix.data.model.UnitType
 import com.azadevs.unitix.data.repository.HistoryRepository
 import kotlinx.coroutines.Job
@@ -18,6 +19,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import kotlin.math.abs
+
+private val SCIENTIFIC_FORMAT = DecimalFormat("0.####E0")
+private val STANDARD_FORMAT = DecimalFormat("#,##0.####")
+private val unitToCategoryMap: Map<UnitType, Category> by lazy {
+    UnitItem.units.associate { it.type to it.category }
+}
 
 /**
  * Created by : Azamat Kalmurzaev
@@ -41,6 +48,7 @@ class ConverterViewModel(
         private set
 
     private var saveJob: Job? = null
+    private var recalcJob: Job? = null
 
     val allHistory = historyRepository.allHistory
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -82,20 +90,28 @@ class ConverterViewModel(
 
     fun onInputChange(text: String) {
         inputText = text
-        recalc()
+        debouncedRecalc()
     }
 
     fun onFromUnitChange(unit: UnitType) {
         fromUnit = unit
-        recalc()
+        recalcImmediate()
     }
 
     fun onToUnitChange(unit: UnitType) {
         toUnit = unit
-        recalc()
+        recalcImmediate()
     }
 
-    private fun recalc() {
+    private fun debouncedRecalc() {
+        recalcJob?.cancel()
+        recalcJob = viewModelScope.launch {
+            delay(100)
+            recalcImmediate()
+        }
+    }
+
+    private fun recalcImmediate() {
         if (inputText.isEmpty()) {
             resultText = "0"
             return
@@ -134,23 +150,15 @@ class ConverterViewModel(
     }
 
     private fun getCategoryForUnit(unit: UnitType): Category {
-        val item = com.azadevs.unitix.data.model.UnitItem.units.find { it.type == unit }
-        return item?.category ?: Category.LENGTH // fallback
+        return unitToCategoryMap[unit] ?: Category.LENGTH
     }
 
     private fun format(v: Double): String {
         val absVal = abs(v)
-
-        return when (absVal) {
-            0.0 -> "0"
-            !in 0.0001..<1.0E9 -> {
-                DecimalFormat("0.####E0").format(v)
-            }
-
-            else -> {
-                val df = DecimalFormat("#,##0.####")
-                df.format(v)
-            }
+        return when {
+            absVal == 0.0 -> "0"
+            absVal < 0.0001 || absVal >= 1.0E9 -> SCIENTIFIC_FORMAT.format(v)
+            else -> STANDARD_FORMAT.format(v)
         }
     }
 
@@ -158,7 +166,7 @@ class ConverterViewModel(
         val temp = fromUnit
         fromUnit = toUnit
         toUnit = temp
-        recalc()
+        recalcImmediate()
     }
 
     fun clearInput() {

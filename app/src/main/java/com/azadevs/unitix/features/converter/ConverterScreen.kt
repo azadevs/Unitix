@@ -1,7 +1,6 @@
 package com.azadevs.unitix.features.converter
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -242,12 +241,10 @@ fun ConvertScreen(
                         Column(
                             modifier = Modifier
                                 .padding(16.dp)
-                                .animateContentSize()
                         ) {
                             OutlinedTextField(
                                 value = viewModel.inputText,
                                 onValueChange = { newText ->
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     viewModel.onInputChange(newText)
                                 },
                                 label = { Text(stringResource(R.string.value)) },

@@ -31,8 +31,9 @@ fun UnitDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val selectedItem = items.firstOrNull { it.type == selected }
-        ?: return
+    val selectedItem = remember(selected, items) {
+        items.firstOrNull { it.type == selected }
+    } ?: return
 
     ExposedDropdownMenuBox(
         expanded = expanded,
