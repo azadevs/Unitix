@@ -54,8 +54,6 @@ fun AppNav(modifier: Modifier = Modifier) {
             } ?: true
         }
     }
-
-    // Hoist DI dependencies to AppNav scope to avoid re-creation on navigation
     val context = LocalContext.current
     val database = remember { UnitixDatabase.getDatabase(context) }
     val retrofit = remember {
@@ -82,7 +80,7 @@ fun AppNav(modifier: Modifier = Modifier) {
                 )
             }
         }
-    ) { innerPadding ->
+    ) { _ ->
 
         NavHost(
             navController = navController,

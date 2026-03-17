@@ -76,9 +76,9 @@ fun HomeScreen(
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val clipboardManager =
-        remember { com.azadevs.unitix.features.home.UnitixClipboardManager(context) }
+        remember { UnitixClipboardManager(context) }
     var clipboardData by remember {
-        mutableStateOf<com.azadevs.unitix.features.home.ClipboardData?>(
+        mutableStateOf<ClipboardData?>(
             null
         )
     }
