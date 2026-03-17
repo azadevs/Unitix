@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,22 +27,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.azadevs.unitix.features.currency.CurrencyUiModel
+import com.azadevs.unitix.features.currency.CurrencyDisplayModel
 import java.util.Locale
 
 @Composable
 fun CurrencyRateItem(
-    model: CurrencyUiModel,
-    displayRate: String,
+    model: CurrencyDisplayModel,
     isSelected: Boolean
 ) {
-    val bgColor =
-        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-    val textColor =
-        if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-    val trendColor = if (model.isUp) Color(0xFF10B981) else Color(0xFFEF4444)
-    val trendIcon =
+    val primaryContainer = MaterialTheme.colorScheme.primaryContainer
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onPrimaryContainer = MaterialTheme.colorScheme.onPrimaryContainer
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+
+    val bgColor = remember(isSelected, primaryContainer, surfaceVariant) {
+        if (isSelected) primaryContainer else surfaceVariant
+    }
+    val textColor = remember(isSelected, onPrimaryContainer, onSurfaceVariant) {
+        if (isSelected) onPrimaryContainer else onSurfaceVariant
+    }
+    val trendColor = remember(model.isUp) {
+        if (model.isUp) Color(0xFF10B981) else Color(0xFFEF4444)
+    }
+    val trendIcon = remember(model.isUp) {
         if (model.isUp) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown
+    }
+    val countryCode = remember(model.code) {
+        if (model.code.length >= 2) model.code.substring(0, 2)
+            .lowercase(Locale.getDefault()) else "xx"
+    }
+    val flagUrl = remember(countryCode) { "https://flagcdn.com/w80/${countryCode}.png" }
+    val trendText = remember(model.trendPercentage) {
+        String.format(Locale.US, "%.2f%%", model.trendPercentage)
+    }
 
     Row(
         modifier = Modifier
@@ -54,10 +72,6 @@ fun CurrencyRateItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            val countryCode = if (model.code.length >= 2) model.code.substring(0, 2)
-                .lowercase(Locale.getDefault()) else "xx"
-            val flagUrl = "https://flagcdn.com/w80/${countryCode}.png"
-
             AsyncImage(
                 model = flagUrl,
                 contentDescription = "${model.code} flag",
@@ -88,7 +102,7 @@ fun CurrencyRateItem(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = String.format(Locale.US, "%.2f%%", model.trendPercentage),
+                            text = trendText,
                             style = MaterialTheme.typography.labelSmall,
                             color = trendColor,
                             fontWeight = FontWeight.Medium
@@ -99,7 +113,7 @@ fun CurrencyRateItem(
         }
 
         Text(
-            text = displayRate,
+            text = model.formattedRate,
             style = MaterialTheme.typography.titleMedium,
             color = textColor,
             fontWeight = FontWeight.SemiBold

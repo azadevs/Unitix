@@ -1,20 +1,26 @@
 package com.azadevs.unitix.features.currency
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.azadevs.unitix.data.repository.CurrencyRepository
 import com.azadevs.unitix.data.repository.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import java.text.DecimalFormat
 
 /**
  * Created by : Azamat Kalmurzaev
  * 03/10/26
  */
+@Immutable
 data class CurrencyUiModel(
     val code: String,
     val rate: Double,
@@ -22,6 +28,16 @@ data class CurrencyUiModel(
     val isUp: Boolean
 )
 
+@Immutable
+data class CurrencyDisplayModel(
+    val code: String,
+    val rate: Double,
+    val trendPercentage: Double,
+    val isUp: Boolean,
+    val formattedRate: String
+)
+
+@Immutable
 data class CurrencyUiState(
     val rates: List<CurrencyUiModel> = emptyList(),
     val isLoading: Boolean = false,
@@ -36,6 +52,30 @@ class CurrencyViewModel(
 
     private val _uiState = MutableStateFlow(CurrencyUiState())
     val uiState: StateFlow<CurrencyUiState> = _uiState.asStateFlow()
+
+    private val formatter = DecimalFormat("#,##0.0000")
+    private val daySeed = System.currentTimeMillis() / (1000 * 60 * 60 * 24)
+
+    val displayRates: StateFlow<List<CurrencyDisplayModel>> = combine(
+        _uiState
+    ) { states ->
+        val state = states[0]
+        val baseRate = state.rates.find { it.code == state.baseCurrency }?.rate ?: 1.0
+        val query = state.searchQuery
+
+        state.rates
+            .filter { it.code.contains(query, ignoreCase = true) }
+            .map { model ->
+                val convertedRate = if (baseRate > 0) (1.0 / baseRate) * model.rate else 0.0
+                CurrencyDisplayModel(
+                    code = model.code,
+                    rate = model.rate,
+                    trendPercentage = model.trendPercentage,
+                    isUp = model.isUp,
+                    formattedRate = formatter.format(convertedRate)
+                )
+            }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         loadRates()
@@ -84,16 +124,13 @@ class CurrencyViewModel(
     }
 
     private fun generateTrend(currencyCode: String): Pair<Double, Boolean> {
-        // Pseudo-random but stable for the day
-        val daySeed = System.currentTimeMillis() / (1000 * 60 * 60 * 24)
+        if (currencyCode == "USD") return Pair(0.0, true)
+
         val stringSeed = currencyCode.hashCode().toLong()
         val combinedSeed = daySeed + stringSeed
         val random = java.util.Random(combinedSeed)
 
-        // Exclude USD since it's the base
-        if (currencyCode == "USD") return Pair(0.0, true)
-
-        val trend = random.nextDouble() * 2.5 // Up to 2.5% change
+        val trend = random.nextDouble() * 2.5
         val isUp = random.nextBoolean()
         return Pair(trend, isUp)
     }

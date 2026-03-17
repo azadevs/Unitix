@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.azadevs.unitix.features.currency.component.CurrencyRateItem
-import java.text.DecimalFormat
 import java.util.Locale
 
 /**
@@ -59,6 +58,7 @@ fun CurrencyScreen(
     viewModel: CurrencyViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val displayRates by viewModel.displayRates.collectAsState()
 
     Scaffold(
         topBar = {
@@ -195,28 +195,13 @@ fun CurrencyScreen(
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                val filteredRates = remember(uiState.searchQuery, uiState.rates) {
-                    uiState.rates.filter {
-                        it.code.contains(uiState.searchQuery, ignoreCase = true)
-                    }
-                }
-                val baseRate = remember(uiState.baseCurrency, uiState.rates) {
-                    uiState.rates.find { it.code == uiState.baseCurrency }?.rate ?: 1.0
-                }
-                val formatter = remember { DecimalFormat("#,##0.0000") }
-
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(
-                        items = filteredRates,
+                        items = displayRates,
                         key = { it.code }
                     ) { model ->
-                        val convertedRate = remember(baseRate, model.rate) {
-                            if (baseRate > 0) (1.0 / baseRate) * model.rate else 0.0
-                        }
-
                         CurrencyRateItem(
                             model = model,
-                            displayRate = formatter.format(convertedRate),
                             isSelected = model.code == uiState.baseCurrency
                         )
                     }
